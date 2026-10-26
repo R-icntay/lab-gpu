@@ -1,0 +1,73 @@
+{
+ "updated": "2026-11-14T12:00",
+ "node": "seymour2",
+ "limit": 3,
+ "days": 7,
+ "sample_hours": 1,
+ "state": {
+  "enabled": true,
+  "flags": "",
+  "used": 1,
+  "total": 8
+ },
+ "members": [
+  "ak••••",
+  "cw••••",
+  "da••••",
+  "ds••••",
+  "eb••••",
+  "el••••",
+  "eo••••",
+  "ew••••",
+  "gu••••",
+  "ka••••",
+  "lc••••",
+  "le••••",
+  "li••••",
+  "mc••••",
+  "mi••••",
+  "sn••••",
+  "sp••••",
+  "zh••••"
+ ],
+ "free_takers": 0,
+ "now": [
+  {
+   "user": "el••••",
+   "running": 1,
+   "queued": 0,
+   "can_take": 0,
+   "note": "",
+   "flag": ""
+  }
+ ],
+ "slots": [
+  "el••••"
+ ],
+ "week": [
+  {
+   "user": "li••••",
+   "gpu_hours": 297,
+   "peak": 8,
+   "over": 54
+  },
+  {
+   "user": "ak••••",
+   "gpu_hours": 115,
+   "peak": 4,
+   "over": 7
+  },
+  {
+   "user": "el••••",
+   "gpu_hours": 68,
+   "peak": 2,
+   "over": 0
+  },
+  {
+   "user": "ew••••",
+   "gpu_hours": 58,
+   "peak": 3,
+   "over": 0
+  }
+ ]
+}
