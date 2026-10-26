@@ -1,0 +1,35 @@
+{
+ "updated": "2026-10-31T12:00",
+ "node": "seymour2",
+ "limit": 3,
+ "days": 7,
+ "sample_hours": 2,
+ "state": {
+  "enabled": true,
+  "flags": "",
+  "used": 0,
+  "total": 8
+ },
+ "now": [],
+ "slots": [],
+ "week": [
+  {
+   "user": "li••••",
+   "gpu_hours": 204,
+   "peak": 6,
+   "over": 12
+  },
+  {
+   "user": "ak••••",
+   "gpu_hours": 38,
+   "peak": 4,
+   "over": 4
+  },
+  {
+   "user": "ew••••",
+   "gpu_hours": 30,
+   "peak": 2,
+   "over": 0
+  }
+ ]
+}

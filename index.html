@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lee Lab H100s</title>
+<meta name="robots" content="noindex">
+<style>
+/* Layout: a single board. The 8 cards are the hero (one tile per GPU), then who holds them, then the week. */
+:root {
+  --bg: #f4f5f7; --panel: #ffffff; --ink: #161a22; --ink-2: #5a6372; --rule: #dde1e7;
+  --free: #eef0f3; --free-edge: #c9ced6;
+  --ok: #1f7a4d; --ok-soft: #e2f3ea; --warn: #9a5a00; --warn-soft: #fdf0dc; --bad: #b3261e; --bad-soft: #fbe4e2;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", "JetBrains Mono", Menlo, Consolas, monospace;
+  --tile-l: 74%; --tile-s: 62%; --tile-ink: #11151c;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1216; --panel: #171b21; --ink: #e6e9ee; --ink-2: #9aa3b2; --rule: #2a313b;
+    --free: #1b2028; --free-edge: #39424f;
+    --ok: #6fd3a0; --ok-soft: #13271e; --warn: #f0b660; --warn-soft: #2c2215; --bad: #f08a83; --bad-soft: #2f1716;
+    --tile-l: 66%; --tile-s: 50%; --tile-ink: #0d1015; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1216; --panel: #171b21; --ink: #e6e9ee; --ink-2: #9aa3b2; --rule: #2a313b;
+  --free: #1b2028; --free-edge: #39424f;
+  --ok: #6fd3a0; --ok-soft: #13271e; --warn: #f0b660; --warn-soft: #2c2215; --bad: #f08a83; --bad-soft: #2f1716;
+  --tile-l: 66%; --tile-s: 50%; --tile-ink: #0d1015; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--sans); }
+.wrap { max-width: 860px; margin: 0 auto; padding-inline: 16px; padding-block: max(24px, env(safe-area-inset-top)) 48px;
+  display: grid; gap: 22px; }
+header { display: grid; gap: 6px; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+h1 { margin: 0; font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { color: var(--ink-2); font: 400 0.85rem/1.4 var(--mono); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font: 600 0.78rem/1 var(--mono); padding: 6px 9px;
+  border-radius: 999px; white-space: nowrap; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill.ok { color: var(--ok); background: var(--ok-soft); }
+.pill.bad { color: var(--bad); background: var(--bad-soft); }
+.meta { color: var(--ink-2); font-size: 0.85rem; }
+.meta.stale { color: var(--warn); }
+section { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+h2 { margin: 0; font-size: 0.78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-2);
+  display: flex; justify-content: space-between; gap: 12px; }
+h2 span { letter-spacing: 0; text-transform: none; font-weight: 500; font-family: var(--mono); }
+.cards { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+.card { aspect-ratio: 3 / 4; max-width: 100%; border-radius: 6px; display: grid; align-content: space-between; padding: 7px;
+  font: 600 0.72rem/1.2 var(--mono); color: var(--tile-ink); overflow: hidden; }
+.card .ix { opacity: .8; font-weight: 500; }
+.card .who { overflow-wrap: anywhere; }
+.card.free { background: var(--free); border: 1.5px dashed var(--free-edge); color: var(--ink-2); }
+.card.off { background: repeating-linear-gradient(135deg, var(--free) 0 6px, transparent 6px 12px); border: 1.5px solid var(--free-edge); color: var(--ink-2); }
+@media (max-width: 520px) { .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); } .card { aspect-ratio: 4 / 3; }
+  th, td { padding: 8px 5px; } .flag { padding: 4px 5px; } }
+.tbl { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font-size: 0.72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-2); font-weight: 700; }
+td.n { font: 500 0.9rem/1 var(--mono); font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; vertical-align: -1px; }
+.user { font-family: var(--mono); }
+.flag { font: 700 0.72rem/1 var(--mono); padding: 4px 7px; border-radius: 4px; }
+.flag.over { color: var(--bad); background: var(--bad-soft); }
+.flag.wants { color: var(--warn); background: var(--warn-soft); }
+.empty { color: var(--ink-2); margin: 0; }
+.bars { display: grid; gap: 8px; }
+.bar { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) 5.5rem; gap: 10px; align-items: center; font-size: 0.88rem; }
+.bar .track { height: 10px; background: var(--free); border-radius: 5px; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 5px; }
+.bar .v { font: 500 0.82rem/1 var(--mono); font-variant-numeric: tabular-nums; text-align: right; color: var(--ink-2); }
+.rule { border-left: 3px solid var(--warn); background: var(--warn-soft); padding: 12px 14px; border-radius: 6px; }
+.rule p { margin: 0; }
+footer { color: var(--ink-2); font-size: 0.8rem; display: grid; gap: 4px; }
+code { font: 0.85em var(--mono); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="top">
+      <h1>Lee Lab H100s</h1>
+      <span id="state" class="pill"></span>
+    </div>
+    <div class="sub" id="sub"></div>
+    <div class="meta" id="meta"></div>
+  </header>
+
+  <section aria-labelledby="h-cards">
+    <h2 id="h-cards">The 8 cards <span id="used"></span></h2>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section aria-labelledby="h-now">
+    <h2 id="h-now">Now <span id="limit-note"></span></h2>
+    <div class="tbl" id="now"></div>
+  </section>
+
+  <section aria-labelledby="h-week">
+    <h2 id="h-week">Last 7 days <span>GPU-hours</span></h2>
+    <div class="bars" id="week"></div>
+  </section>
+
+  <div class="rule" id="rule"></div>
+
+  <footer>
+    <span>Draft. Sampled from the scheduler every 2 hours; usernames are shortened on this public page.</span>
+  </footer>
+</div>
+
+<script>
+const STATUS = {"updated": "2026-10-31T12:00", "node": "seymour2", "limit": 3, "days": 7, "sample_hours": 2, "state": {"enabled": true, "flags": "", "used": 0, "total": 8}, "now": [], "slots": [], "week": [{"user": "li••••", "gpu_hours": 204, "peak": 6, "over": 12}, {"user": "ak••••", "gpu_hours": 38, "peak": 4, "over": 4}, {"user": "ew••••", "gpu_hours": 30, "peak": 2, "over": 0}]};
+
+function hue(name) {               // stable colour per (masked) user
+  let h = 0; for (const c of name) h = (h * 31 + c.codePointAt(0)) % 360; return h;
+}
+function color(name) { return `hsl(${hue(name)} var(--tile-s) var(--tile-l))`; }
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === "style" ? e.style.cssText = v : e.setAttribute(k, v);
+  for (const k of kids) e.append(k);
+  return e;
+}
+function ago(iso) {
+  const mins = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} min ago`;
+  const h = Math.floor(mins / 60), m = mins % 60;
+  return h < 48 ? `${h} h ${m} min ago` : `${Math.round(h / 24)} days ago`;
+}
+
+function render(s) {
+  const st = s.state, on = st.enabled;
+  const state = document.getElementById("state");
+  state.className = "pill " + (on ? "ok" : "bad");
+  state.textContent = on ? "queue open" : "queue disabled";
+  document.getElementById("sub").textContent = `${s.node} · 8 × NVIDIA H100 80 GB · project leelab · rule: max ${s.limit} per person`;
+  const hrs = (Date.now() - new Date(s.updated)) / 3.6e6;
+  const meta = document.getElementById("meta");
+  meta.textContent = `Updated ${s.updated.replace("T", " ")} (${ago(s.updated)})` + (hrs > 5 ? " · stale: the sampler may have stopped" : "");
+  meta.className = "meta" + (hrs > 5 ? " stale" : "");
+
+  document.getElementById("used").textContent = `${st.used} in use · ${st.total - st.used} free`;
+  const cards = document.getElementById("cards"); cards.replaceChildren();
+  for (let i = 0; i < st.total; i++) {
+    const who = s.slots[i];
+    if (who) cards.append(el("div", {class: "card", style: `background:${color(who)}`, title: `GPU slot ${i + 1}: ${who}`},
+      el("span", {class: "ix"}, `#${i + 1}`), el("span", {class: "who"}, who)));
+    else cards.append(el("div", {class: on ? "card free" : "card off", title: on ? "free" : "queue disabled"},
+      el("span", {class: "ix"}, `#${i + 1}`), el("span", {}, on ? "free" : "off")));
+  }
+
+  document.getElementById("limit-note").textContent = `flags above ${s.limit}`;
+  const now = document.getElementById("now"); now.replaceChildren();
+  if (!s.now.length) now.append(el("p", {class: "empty"}, on ? "Nobody is using or queued for the lab GPUs." : "Nobody is using the lab GPUs; nothing can start until the queue is re-enabled."));
+  else {
+    const t = el("table", {}, el("thead", {}, el("tr", {}, el("th", {}, "Person"), el("th", {}, "Running"), el("th", {}, "Queued"), el("th", {}, ""))));
+    const tb = el("tbody");
+    for (const r of s.now) {
+      const f = r.flag === "over" ? el("span", {class: "flag over"}, `OVER ${s.limit}`)
+              : r.flag === "wants" ? el("span", {class: "flag wants"}, `WANTS >${s.limit}`) : "";
+      tb.append(el("tr", {}, el("td", {class: "user"}, el("span", {class: "sw", style: `background:${color(r.user)}`}), r.user),
+        el("td", {class: "n"}, String(r.running)), el("td", {class: "n"}, String(r.queued)), el("td", {}, f)));
+    }
+    t.append(tb); now.append(t);
+  }
+
+  const week = document.getElementById("week"); week.replaceChildren();
+  if (!s.week.length) week.append(el("p", {class: "empty"}, "No lab GPU use recorded in the last 7 days."));
+  const max = Math.max(1, ...s.week.map(w => w.gpu_hours));
+  for (const w of s.week) week.append(el("div", {class: "bar"},
+    el("span", {class: "user"}, el("span", {class: "sw", style: `background:${color(w.user)}`}), w.user),
+    el("div", {class: "track"}, el("div", {class: "fill", style: `width:${100 * w.gpu_hours / max}%;background:${color(w.user)}`})),
+    el("span", {class: "v"}, `${w.gpu_hours} h · peak ${w.peak}`)));
+
+  document.getElementById("rule").replaceChildren(el("p", {},
+    el("b", {}, `Lab rule: at most ${s.limit} of the 8 lab H100s per person. `),
+    `If you need more, say so in the lab channel first. "WANTS" means running + queued jobs would take someone above ${s.limit}.`));
+}
+
+if (STATUS) render(STATUS);
+async function refresh() {
+  try { const r = await fetch("status.json", {cache: "no-store"}); if (r.ok) render(await r.json()); } catch (e) {}
+}
+setInterval(refresh, 10 * 60 * 1000);   // an open tab picks up the next sample
+</script>
+</body>
+</html>
